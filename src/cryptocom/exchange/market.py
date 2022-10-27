@@ -87,11 +87,17 @@ class Exchange:
         ]
         return OrderBook(buys, sells, pair)
 
-    async def get_candles(self, pair: Pair, period: Period) -> List[Candle]:
-        data = await self.api.get(
-            "public/get-candlestick",
-            {"instrument_name": pair.name, "timeframe": period.value},
-        )
+    async def get_candles(self, pair: Pair, period: Period, endTime:int = None) -> List[Candle]:
+
+        data = []
+        if endTime:
+            data = await self.api.get(
+                "public/get-candlestick",
+                {"instrument_name": pair.name, "timeframe": period.value, "end_time": endTime*1000})
+        else:
+            data = await self.api.get(
+                "public/get-candlestick",
+                {"instrument_name": pair.name, "timeframe": period.value})
         return [Candle.from_api(pair, candle) for candle in data]
 
     async def listen_candles(
