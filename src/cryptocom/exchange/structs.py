@@ -141,11 +141,11 @@ class Candle:
     def from_api(cls, pair: Pair, data: Dict):
         return cls(
             time=int(data["t"] / 1000),
-            open=pair.round_price(data["o"]),
-            high=pair.round_price(data["h"]),
-            low=pair.round_price(data["l"]),
-            close=pair.round_price(data["c"]),
-            volume=pair.round_quantity(data["v"]),
+            open=pair.round_price(float(data["o"])),
+            high=pair.round_price(float(data["h"])),
+            low=pair.round_price(float(data["l"])),
+            close=pair.round_price(float(data["c"])),
+            volume=pair.round_quantity(float(data["v"])),
             pair=pair,
         )
 
