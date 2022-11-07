@@ -91,9 +91,9 @@ class Exchange:
 
         data = []
         if endTime:
-            data = await self.api.get(
+            data = await self.api.get_deriv(
                 "public/get-candlestick",
-                {"instrument_name": pair.name, "timeframe": period.value, "end_time": endTime*1000})
+                {"instrument_name": pair.name, "timeframe": period.value, "end_ts": endTime*1000, "count": 5000})
         else:
             data = await self.api.get(
                 "public/get-candlestick",

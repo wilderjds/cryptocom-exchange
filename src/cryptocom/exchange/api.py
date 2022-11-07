@@ -123,12 +123,14 @@ class ApiProvider:
         root_url="https://api.crypto.com/v2/",
         ws_root_url="wss://stream.crypto.com/v2/",
         logger=None,
+        deriv_root_url="https://deriv-api.crypto.com/v1/",
     ):
         self.ssl_context = httpx.create_ssl_context()
         self.api_key = api_key
         self.api_secret = api_secret
         self.root_url = root_url
         self.ws_root_url = ws_root_url
+        self.deriv_root_url = deriv_root_url
         self.timeout = timeout
         self.retries = retries
         self.last_request_path = ""
@@ -195,7 +197,9 @@ class ApiProvider:
             else:
                 raise ApiError(f"Wrong path: {path}")
 
-    async def request(self, method, path, params=None, data=None, sign=False):
+    async def request(self, method, path, params=None, data=None, sign=False, root=None):
+        if not root:
+            root=self.root_url
         original_data = data
         limiter = self.get_limiter(path)
 
@@ -210,7 +214,7 @@ class ApiProvider:
                 async with limiter:
                     resp = await client.request(
                         method,
-                        urljoin(self.root_url, path),
+                        urljoin(root, path),
                         params=params,
                         json=data,
                         headers={"content-type": "application/json"},
@@ -254,6 +258,9 @@ class ApiProvider:
 
     async def get(self, path, params=None, sign=False):
         return await self.request("get", path, params=params, sign=sign)
+
+    async def get_deriv(self, path, params=None, sign=False):
+        return await self.request("get", path, params=params, sign=sign, root=self.deriv_root_url)
 
     async def post(self, path, data=None, sign=True):
         return await self.request("post", path, data=data, sign=sign)
